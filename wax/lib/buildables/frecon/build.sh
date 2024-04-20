@@ -13,5 +13,5 @@ else
 	cd frecon-repo
 	make clean
 fi
-make all "$CROSS"
+make all FRECON_LITE=1 NOSTRIP=0 "$CROSS"
 cp frecon-lite ..

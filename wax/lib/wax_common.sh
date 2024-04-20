@@ -34,6 +34,10 @@ log_info() {
 	printf "${COLOR_GREEN}Info: %b${COLOR_RESET}\n" "$*" || :
 }
 
+log_error() {
+	printf "${COLOR_RED_B}Error: %b${COLOR_RESET}\n" "$*" || :
+}
+
 suppress() {
 	if [ "${FLAGS_debug:-0}" = "${FLAGS_TRUE:-1}" ]; then
 		"$@"
@@ -142,6 +146,7 @@ ARCHITECTURE="$(uname -m)"
 case "$ARCHITECTURE" in
 	*x86_64* | *x86-64*) ARCHITECTURE=x86_64 ;;
 	*aarch64* | *armv8*) ARCHITECTURE=aarch64 ;;
+	*i[3-6]86*) ARCHITECTURE=i386 ;;
 	*) fail "Unsupported architecture $ARCHITECTURE" ;;
 esac
 
@@ -150,16 +155,20 @@ if command -v sfdisk &>/dev/null && check_semver_ge "$(sfdisk --version | awk '{
 	SFDISK=sfdisk
 else
 	log_debug "using bundled sfdisk"
-	SFDISK="${SCRIPT_DIR}/lib/sfdisk.$ARCHITECTURE"
+	SFDISK="${SCRIPT_DIR}/lib/bin/$ARCHITECTURE/sfdisk"
 	chmod +x "$SFDISK"
 fi
 
 # no way to check cgpt version, so we always use the bundled build
-CGPT="${SCRIPT_DIR}/lib/cgpt.$ARCHITECTURE"
+CGPT="${SCRIPT_DIR}/lib/bin/$ARCHITECTURE/cgpt"
 chmod +x "$CGPT"
 
 format_bytes() {
 	numfmt --to=iec-i --suffix=B "$@"
+}
+
+parse_bytes() {
+	numfmt --from=iec "$@" 2>/dev/null
 }
 
 check_file_rw() {
@@ -183,12 +192,20 @@ safesync() {
 	sleep 0.2
 }
 
+get_sectors() {
+	"$SFDISK" -l "$1" 2>/dev/null | grep "sectors$" | awk '{print $(NF-1)}'
+}
+
 get_sector_size() {
-	"$SFDISK" -l "$1" | grep "Sector size" | awk '{print $4}'
+	"$SFDISK" -l "$1" 2>/dev/null | grep "^Sector size" | awk '{print $4}'
 }
 
 get_final_sector() {
-	"$SFDISK" -l -o end "$1" | grep "^\s*[0-9]" | awk '{print $1}' | sort -nr | head -n 1
+	"$SFDISK" -l -o end "$1" 2>/dev/null | grep "^\s*[0-9]" | awk '{print $1}' | sort -nr | head -n 1
+}
+
+get_gpt_backup_table_sector() {
+	"$CGPT" show "$1" | grep "Sec GPT table$" | awk '{print $1}'
 }
 
 get_parts() {
@@ -227,14 +244,53 @@ squash_partitions() {
 
 truncate_image() {
 	local buffer=35 # magic number to ward off evil gpt corruption spirits
-	local sector_size=$("$SFDISK" -l "$1" | grep "Sector size" | awk '{print $4}')
+	local sector_size=$(get_sector_size "$1")
 	local final_sector=$(get_final_sector "$1")
 	local end_bytes=$(((final_sector + buffer) * sector_size))
-
 	log_info "Truncating image to $(format_bytes "$end_bytes")"
-	truncate -s "$end_bytes" "$1"
 
-	# recreate backup gpt table/header
-	suppress sgdisk -e "$1" 2>&1 | sed 's/\a//g'
-	# todo: this (sometimes) works: "$SFDISK" --relocate gpt-bak-std "$1"
+	if [ -b "$1" ]; then
+		local loopdev=$(losetup -f)
+		losetup -P "$loopdev" "$1" --sizelimit "$end_bytes"
+		suppress sgdisk -e "$loopdev" 2>&1 | sed 's/\a//g'
+		losetup -d "$loopdev"
+	else
+		truncate -s "$end_bytes" "$1"
+		suppress sgdisk -e "$1" 2>&1 | sed 's/\a//g'
+	fi
+
+	[ -z "$2" ] || echo "$end_bytes" >"$2"
+}
+
+resize_image() {
+	# 1: size, 2: image, 3: loop (optional)
+	if [ -b "$2" ]; then
+		echo "$2 is a block device, cannot resize" >&2
+		return 1
+	fi
+	log_info "Resizing image to $(format_bytes "$1")"
+	truncate -s "$1" "$2"
+	suppress sgdisk -e "$2" 2>&1 | sed 's/\a//g'
+	[ -z "$3" ] || losetup -c "$3"
+}
+
+cgpt_add_auto() {
+	local final_sector gpt_sector difference img_sectors sector_size new_size
+	local image="$1"
+	local device="$2"
+	local part="$3"
+	local sectors="$4"
+	shift 4
+	final_sector=$(get_final_sector "$device")
+	gpt_sector=$(get_gpt_backup_table_sector "$device")
+	difference=$((gpt_sector - final_sector - sectors - 1))
+	if [ "$difference" -lt 0 ]; then
+		img_sectors=$(get_sectors "$device")
+		sector_size=$(get_sector_size "$device")
+		# remember difference is negative
+		new_size=$((sector_size * (img_sectors - difference)))
+		resize_image "$new_size" "$image" "$device"
+	fi
+	"$CGPT" add "$device" -i "$part" -b $((final_sector + 1)) -s "$sectors" "$@"
+	partx -u -n "$part" "$device"
 }

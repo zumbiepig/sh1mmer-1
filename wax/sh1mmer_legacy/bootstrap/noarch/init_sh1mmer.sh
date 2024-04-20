@@ -13,7 +13,7 @@ ARCHITECTURE="${4:-x86_64}"
 
 ROOTFS_DEV=
 
-SCRIPT_DATE="[2024-01-28]"
+SCRIPT_DATE="[2024-04-16]"
 
 COLOR_RESET="\033[0m"
 COLOR_BLACK_B="\033[1;30m"
@@ -57,7 +57,7 @@ self_shell() {
 	echo "This shell has PID 1. Exit = kernel panic."
 	enable_input
 	printf "\033[?25h"
-	exec sh
+	exec setsid -c sh
 }
 
 unmount_and_self_shell() {
@@ -80,6 +80,12 @@ poll_key() {
 	echo "$held_key"
 }
 
+clear_line() {
+	local cols
+	cols=$(stty size | cut -d" " -f 2)
+	printf "%-${cols}s\r"
+}
+
 pv_dircopy() {
 	[ -d "$1" ] || return 1
 	local apparent_bytes
@@ -96,12 +102,21 @@ determine_rootfs() {
 }
 
 patch_new_root_sh1mmer() {
-	[ -f "$NEWROOT_MNT/usr/sbin/factory_install.sh" ] && cp "$NEWROOT_MNT/usr/sbin/factory_install.sh" "$NEWROOT_MNT/usr/sbin/factory_install_backup.sh"
 	# ctrl+u boot unlock (to be improved)
 	[ -f "$NEWROOT_MNT/etc/init/startup.conf" ] && sed -i "s/exec/pre-start script\nvpd -i RW_VPD -s block_devmode=0\ncrossystem block_devmode=0\nend script\n\nexec/" "$NEWROOT_MNT/etc/init/startup.conf"
+	# disable factory-related jobs
+	local file
+	local disable_jobs="factory_shim factory_install factory_ui"
+	for job in $disable_jobs; do
+		file="$NEWROOT_MNT/etc/init/${job}.conf"
+		if [ -f "$file" ]; then
+			sed -i '/^start /!d' "$file"
+			echo "exec true" >>"$file"
+		fi
+	done
 }
 
-# todo: dev console on tty4, better logging, wait key
+# todo: dev console on tty4, better logging
 
 disable_input
 case "$(poll_key)" in
@@ -115,7 +130,7 @@ mount -t tmpfs tmpfs "$NEWROOT_MNT" -o "size=$TMPFS_SIZE" || fail "Failed to mou
 determine_rootfs || fail "Could not determine rootfs"
 mount -o ro "$ROOTFS_DEV" "$ROOTFS_MNT" || fail "Failed to mount rootfs $ROOTFS_DEV"
 
-printf "\033[2J\033[H"
+printf "\033[?25l\033[2J\033[H"
 
 printf "${COLOR_CYAN_B}"
 echo "ICBfX18gXyAgXyBfIF9fICBfXyBfXyAgX18gX19fIF9fXyAKIC8gX198IHx8IC8gfCAgXC8gIHwgIFwvICB8IF9ffCBfIFwKIFxfXyBcIF9fIHwgfCB8XC98IHwgfFwvfCB8IF98fCAgIC8KIHxfX18vX3x8X3xffF98ICB8X3xffCAgfF98X19ffF98X1wKCg==" | base64 -d

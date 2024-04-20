@@ -29,13 +29,9 @@ and see what board it corresponds to. **DO NOT DOWNLOAD A RECOVERY IMAGE FROM [c
 If your board name is in the list below, great! Find the RAW RMA shim corresponding to your board online.
 We can no longer provide raw RMA shims due to legal reasons. [**More information here**](https://discord.gg/egWXwEDWKP).
 
-- (**A-B**) ambassador, brask, brya
-- (**C-D**) clapper, coral, corsola, dedede
-- (**D-G**) enguarde, glimmer, grunt
-- (**H-N**) hana, hatch, jacuzzi, kukui
-- (**L-P**) lulu, nami, octopus, orco, pyro
-- (**R-S**) reks, sentry, stout, strongbad
-- (**T-Z**) tidus, ultima, volteer, zork
+ambassador, brask, brya, clapper, coral, corsola, dedede, enguarde, glimmer,
+grunt, hana, hatch, jacuzzi, kefka, kukui, lulu, nami, octopus, orco, pyro,
+reks, sentry, stout, strongbad, tidus, ultima, volteer, zork
 
 If it's not, good luck. You'll have to try and call up your OEM and demand the files from them, which they are most unlikely to give to you.
 
@@ -43,21 +39,32 @@ If it's not, good luck. You'll have to try and call up your OEM and demand the f
 
 ### Building A Beautiful World Shim
 
+<!--
 > [!IMPORTANT]
 > If you're using `coral`, `hana`, or some other older (pre-frecon) boards: <br />
 > **DO NOT FOLLOW THESE INSTRUCTIONS!** Instead, skip to the "[Building A Legacy Shim](#building-a-legacy-shim)" section.
+-->
 
-Now we can start building. Type out all of these commands in the terminal. You need to be on Linux or WSL2 and have the following packages installed: `git`, `wget`.
+Now you can start building. Type out all of these commands in the terminal.
+You need to be on Linux or WSL2 and have the following packages installed: `git`, `wget`.
+You may need to install additional packages, which the script will prompt you to do.
 
 ```
 git clone https://github.com/MercuryWorkshop/sh1mmer
 cd sh1mmer/wax
-wget https://dl.osu.bio/api/raw/?path=/SH1mmer/Chromebrew/chromebrew.tar.gz
-sudo bash wax.sh path/to/the/shim/you/downloaded.bin
+sudo bash wax.sh -i path/to/the/shim/you/downloaded.bin
+```
+This will build a beautiful world mini shim. If you want to add chromebrew, do the following:
+
+```
+git clone https://github.com/MercuryWorkshop/sh1mmer
+cd sh1mmer/wax
+wget https://dl.darkn.bio/api/raw/?path=/SH1mmer/Chromebrew/chromebrew.tar.gz
+sudo bash wax.sh -i path/to/the/shim/you/downloaded.bin --chromebrew chromebrew.tar.gz -s 4G
 ```
 
 > [!NOTE]
-> If you want to build a devshim, replace `chromebrew.tar.gz` with `chromebrew-dev.tar.gz` and add `--dev` to the end of `sudo sh wax.sh /path/to/the/shim/you/downloaded.bin`.
+> If you want to build a devshim, replace `chromebrew.tar.gz` with `chromebrew-dev.tar.gz` and replace `-s 4G` with `-s 7G` in the wax command.
 > Devshim builds will mount a much larger Chromebrew partition over `/usr/local`,
 > allowing you to access a desktop environment and even Firefox from within SH1MMER.
 > It's what allowed us to [run DOOM on a shim](https://github.com/CoolElectronics/blog/blob/master/src/content/blog/breaking/doom.jpg?raw=true).
@@ -71,20 +78,20 @@ After injecting, you may continue to the "[Booting Into A Shim](#booting-into-a-
 
 ### Building A Legacy Shim
 
-The raw shim files for boards such as `hana` or `coral` were built before graphics support was added into the tty.
+The factory shims for boards such as `hana` or `coral` were built before graphics support was added into the tty.
 This makes it impossible for the Beautiful World GUI to work and thus a legacy CLI-only shim must be built.
 
-Type out all of these commands in the terminal. You need to be on Linux and have the following packages installed: `gdisk`, `e2fsprogs`.
+Type out all of these commands in the terminal.
 
 ```
 git clone https://github.com/MercuryWorkshop/sh1mmer
 cd sh1mmer/wax
-sudo bash wax_legacy.sh -i path/to/the/shim/you/downloaded.bin
+sudo bash wax.sh -i path/to/the/shim/you/downloaded.bin -p legacy
 ```
 
 > [!NOTE]
-> Building a legacy shim will work on **ALL BOARDS.** The legacy version of wax now also supports nano (shrunken) shims!
-> After the file has been converted into a legacy shim the size can be up to 90% smaller than the original shim.
+> Building a legacy shim will work on **ALL BOARDS.** Legacy shims are easier to update and are
+> recommended for advanced users and developers.
 
 When this finishes, the bin file in the path you provided will have been converted into a **SH1MMER** image.
 *Note that this is a destructive operation, you will need to redownload a fresh shim to try again if it fails.*
@@ -115,7 +122,7 @@ If your Chromebook has never updated to version 112 (or newer) before (check in 
 then you can ignore this and follow the normal instructions. If not, unenrollment will not work as normal.
 
 <details>
-    <summary>Fog Bypass Details</b></summary>
+<summary>Fog Bypass Details</summary>
 
 If your Chromebook is on version 112 or 113, unenrollment is still possible if you're willing to [disable hardware write protection]("https://mrchromebox.tech/#devices).
 On most devices, this will require you to take off the back of the Chromebook and unplug the battery, or jump two pins.
@@ -137,22 +144,24 @@ then you can ignore this and follow the [Unpatch](https://sh1mmer.me/#fog:~:text
 write protection will not work as normal.
 
 <details>
-    <summary>Tsunami Bypass Details</b></summary>
+<summary>Tsunami Bypass Details</summary>
 
-If your Chromebook is between versions 114 and 120, unenrollment is still possible by using cryptosmite. This is bundled and enabled by default in all sh1mmer legacy shims now. Please update your rma shim to include this. If you need a decryption password, try `Info-58-immense!NickName_Arabia-710`.
+If your Chromebook is below ChromeOS version 120, unenrollment is still possible by using [cryptosmite](https://github.com/FWSmasher/CryptoSmite).
+Cryptosmite is now included as an extra payload for all shims.
+
 </details>
 
 ## Credits
 
 - [CoolElectronics](https://discord.com/users/696392247205298207) - Pioneering this wild exploit
-- [ULTRA BLUE#1850](https://discord.com/users/904487572301021265) - Testing & discovering how to disable RootFS verification
+- [ULTRA BLUE](https://discord.com/users/904487572301021265) - Testing & discovering how to disable RootFS verification
 - [Unciaur](https://discord.com/users/465682780320301077) - Found the inital RMA shim
 - [TheMemeSniper](https://discord.com/users/391271835901362198) - Testing
 - [Rafflesia](https://discord.com/users/247349845298249728) - Hosting files
 - [generic](https://discord.com/users/1052016750486638613) - Hosting alternative file mirror & crypto miner (troll emoji)
 - [Bypassi](https://discord.com/users/904829646145720340) - Helped with the website
 - [r58Playz](https://discord.com/users/803355425835188224) - Helped us set parts of the shim & made the initial GUI script
-- [OlyB](https://discord.com/users/476169716998733834) - Scraped additional shims
+- [OlyB](https://discord.com/users/476169716998733834) - Scraped additional shims & last remaining sh1mmer maintainer
 - [Sharp_Jack](https://discord.com/users/1006048734708240434) - Created wax & compiled the first shims
-- [ember#0377](https://discord.com/users/858866662869958668) - Helped with the website
-- [Mark](https://discord.com/users/661272282903347201) - Technical Understanding and Advisory into the ChromeOS ecosystem
+- [ember](https://discord.com/users/1052344689178722375) - Helped with the website
+- [Mark](mailto:mark@mercurywork.shop) - Technical Understanding and Advisory into the ChromeOS ecosystem

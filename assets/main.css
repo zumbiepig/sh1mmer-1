@@ -14,11 +14,11 @@
   box-sizing: border-box;
   margin: 0px;
   padding: 0px;
-  font-family: "Exo", sans-serif;
 }
 
 html {
   scroll-behavior: smooth;
+  font-family: "Exo", sans-serif;
 }
 
 @keyframes scroll {
@@ -44,6 +44,7 @@ html {
 .header h1 {
   font-size: 15vw;
   font-family: "Sofia Sans", sans-serif;
+  user-select: none;
 }
 
 .header .acronym {
@@ -75,7 +76,6 @@ li,
 img {
   margin-top: 30px;
   font-size: 25px;
-
 }
 
 u {
@@ -89,8 +89,7 @@ kbd {
   white-space: nowrap;
   font-size: 90%;
   border-radius: 10px;
-  padding: 3px;
-  vertical-align: middle;
+  padding: 3px 6px;
 }
 kbd::selection{
   background-color: var(--light);
@@ -129,9 +128,14 @@ button {
   transition: filter 250ms;
 }
 
-a:hover,
-button:hover {
+a:not(.disabled):hover,
+button:not(.disabled):hover {
   filter: brightness(80%);
+}
+
+.disabled {
+  filter: grayscale(1) brightness(0.5);
+  cursor: not-allowed !important;
 }
 
 ul {
@@ -142,4 +146,77 @@ ul {
   padding-left: 50px;
   margin: 20px 0px;
   border-left: 3px solid var(--light);
+}
+
+.waxbutton {
+  display: block;
+  width: max-content;
+  user-select: none;
+  cursor: pointer;
+  text-align: center;
+  margin: 16px auto;
+  font-size: 30px;
+  font-weight: bold;
+}
+
+#displayContainer {
+  display: none;
+  justify-content: space-evenly;
+}
+
+.builderlog * {
+}
+
+.builderlog {
+  font-family: monospace;
+  color: white;
+  background-color: black;
+  width: 40vw;
+  height: 20vw;
+  font-family: monospace;
+  font-size: 13px;
+  box-shadow: 1px 2px 5px 0px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  position: relative;
+  white-space: pre;
+}
+
+#linuxOutput {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.waxfooter {
+  margin-top: 50px;
+  text-align: center;
+  font-size: 25px;
+}
+
+#waxOptions {
+  display: flex;
+  justify-content: space-evenly;
+  gap: 20px;
+  margin-bottom: 50px;
+}
+
+#waxOptions input[type=checkbox] {
+  transform: scale(1.5);
+  cursor: pointer;
+  accent-color: #0f9931;
+  vertical-align: baseline;
+}
+
+#waxOptions label {
+  font-size: 20px;
+}
+
+#waxOptions span {
+  color: white;
+  margin: 5px;
+}
+
+#waxOptions label i {
+  display: block;
+  font-size: 75%;
 }

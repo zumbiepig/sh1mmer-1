@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# use merge_nano.sh --help
+# use rma_merge.sh --help
 # todo: make this script standalone
 
 chmod +x lib/py/image_tool.py

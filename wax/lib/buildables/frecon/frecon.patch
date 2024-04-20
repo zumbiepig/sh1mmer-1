@@ -1,13 +1,10 @@
 diff --git a/Makefile b/Makefile
-index 3fef7e9..b5a5d16 100644
+index 3fef7e9..8c09091 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -4,9 +4,9 @@
+@@ -6,7 +6,7 @@ include common.mk
  
- include common.mk
- 
--FRECON_LITE ?= 0
-+FRECON_LITE ?= 1
+ FRECON_LITE ?= 0
  
 -PC_DEPS = libdrm libpng libtsm
 +PC_DEPS = libdrm libpng libtsm zlib
@@ -24,18 +21,9 @@ index 3fef7e9..b5a5d16 100644
  $(OUT)glyphs.h: $(SRC)/font_to_c.py $(SRC)/ter-u16n.bdf
  	$(SRC)/font_to_c $(SRC)/ter-u16n.bdf $(OUT)glyphs.h
 diff --git a/common.mk b/common.mk
-index 0f4458e..ae62d8a 100644
+index 0f4458e..43038ce 100644
 --- a/common.mk
 +++ b/common.mk
-@@ -95,7 +95,7 @@
- 
- # Behavior configuration variables
- SPLITDEBUG ?= 0
--NOSTRIP ?= 1
-+NOSTRIP ?= 0
- VALGRIND ?= 0
- COLOR ?= 1
- VERBOSE ?= 0
 @@ -311,7 +311,7 @@ endif
  # The same goes for CFLAGS.
  COMMON_CFLAGS-gcc := -fvisibility=internal -ggdb3 -Wa,--noexecstack
@@ -45,3 +33,25 @@ index 0f4458e..ae62d8a 100644
  CXXFLAGS += $(COMMON_CFLAGS) $(COMMON_CFLAGS-$(CXXDRIVER))
  CFLAGS += $(COMMON_CFLAGS) $(COMMON_CFLAGS-$(CDRIVER))
  CPPFLAGS += -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3
+diff --git a/term.c b/term.c
+index dc27b84..5b5f7bb 100644
+--- a/term.c
++++ b/term.c
+@@ -357,7 +357,7 @@ static void term_osc_cb(struct tsm_vte *vte, const uint32_t *osc_string,
+ 	char *osc;
+ 
+ 	for (i = 0; i < osc_len; i++)
+-		if (osc_string[i] >= 128)
++		if (((char *)osc_string)[i] >= 128)
+ 			return; /* we only want to deal with ASCII */
+ 
+ 	osc = malloc(osc_len + 1);
+@@ -367,7 +367,7 @@ static void term_osc_cb(struct tsm_vte *vte, const uint32_t *osc_string,
+ 	}
+ 
+ 	for (i = 0; i < osc_len; i++)
+-		osc[i] = (char)osc_string[i];
++		osc[i] = ((char *)osc_string)[i];
+ 	osc[i] = '\0';
+ 
+ 	if (strncmp(osc, "image:", 6) == 0)

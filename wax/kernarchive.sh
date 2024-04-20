@@ -18,7 +18,7 @@ check_deps() {
 missing_deps=$(check_deps sfdisk sgdisk tar)
 [ "$missing_deps" ] && fail "The following required commands weren't found in PATH:\n${missing_deps}"
 
-[ -z "$2" ] && fail "Usage: kernarchive.sh <device> <archive.tar>"
+[ -z "$2" ] && fail "Usage: $0 <device> <archive.tar>"
 [ -b "$1" -o -f "$1" ] || fail "$1 doesn't exist or is not a file or block device"
 [ -r "$1" ] || fail "Cannot read $1, try running as root?"
 sfdisk -l "$1" 2>/dev/null | grep -q "Disklabel type: gpt" || fail "$1 is not GPT, or is corrupted"

@@ -50,7 +50,7 @@ truncate_image_verbose() {
 	sgdisk -e "$1" 2>&1 | sed 's/\a//g'
 }
 
-[ -z "$1" ] && fail "Usage: gpttruncate.sh <gpt_image.bin> [gpt_image_2.bin] [...]"
+[ -z "$1" ] && fail "Usage: $0 <gpt_image.bin> [gpt_image_2.bin] [...]"
 
 for file in "$@"; do
 	truncate_image_verbose "$file" || echo "ERROR truncating ${file}" >&2

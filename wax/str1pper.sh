@@ -5,11 +5,13 @@ SCRIPT_DIR=${SCRIPT_DIR:-"."}
 
 set -eE
 
+SCRIPT_DATE="2024-02-12"
+
 echo "┌────────────────────────────────────────────────────────────────────────────────────┐"
 echo "│ str1pper spash text                                                                │"
 echo "│ delete any and all payloads from p1 (stateful) on a rma image, squash partitions   │"
 echo "│ Credits: OlyB                                                                      │"
-echo "│ Prerequisites: gdisk, e2fsprogs must be installed, program must be run as root     │"
+echo "│ Script date: $SCRIPT_DATE                                                            │"
 echo "└────────────────────────────────────────────────────────────────────────────────────┘"
 
 [ "$EUID" -ne 0 ] && fail "Please run as root"
@@ -30,7 +32,7 @@ recreate_stateful() {
 	local sector_size=$(get_sector_size "$LOOPDEV")
 	"$CGPT" add "$LOOPDEV" -i 1 -b $((final_sector + 1)) -s $((STATEFUL_SIZE / sector_size)) -t data -l STATE
 	partx -u -n 1 "$LOOPDEV"
-	suppress mkfs.ext4 -F -L STATE "${LOOPDEV}p1"
+	suppress mkfs.ext4 -F -b 4096 -L STATE "${LOOPDEV}p1"
 
 	safesync
 

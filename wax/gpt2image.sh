@@ -20,7 +20,7 @@ check_deps() {
 missing_deps=$(check_deps sfdisk sgdisk)
 [ "$missing_deps" ] && fail "The following required commands weren't found in PATH:\n${missing_deps}"
 
-[ -z "$2" ] && fail "Usage: gpt2image.sh <device> <gpt_image.bin> [-y]"
+[ -z "$2" ] && fail "Usage: $0 <device> <gpt_image.bin> [-y]"
 [ -b "$1" ] || fail "$1 doesn't exist or is not a block device"
 [ -r "$1" ] || fail "Cannot read $1, try running as root?"
 sfdisk -l "$1" 2>/dev/null | grep -q "Disklabel type: gpt" || fail "$1 is not GPT, or is corrupted"

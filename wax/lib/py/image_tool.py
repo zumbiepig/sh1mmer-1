@@ -2178,13 +2178,13 @@ class ChromeOSFactoryBundle:
     partitions of each selected boards.
 
     The layout of the merged output image:
-       1 stateful  [sh1mmer-rmaimg1]
-       2 kernel_a  [install-rmaimg1]
-       3 rootfs_a  [install-rmaimg1]
-       4 rootfs_a  [install-rmaimg1]
-       5 kernel_a  [install-rmaimg2]
-       6 rootfs_a  [install-rmaimg2]
-       7 rootfs_a  [install-rmaimg2]
+       1 stateful  [img1]
+       2 kernel_a  [img1]
+       3 rootfs_a  [img1]
+       4 rootfs_a  [img1]
+       5 kernel_a  [img2]
+       6 rootfs_a  [img2]
+       7 rootfs_a  [img2]
       ...
 
     Args:
