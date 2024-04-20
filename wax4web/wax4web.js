@@ -51,6 +51,7 @@ const wax4webEmulator = `
 and <a href="https://github.com/copy/v86">v86</a></div>
 `;
 
+const wax4webTarZipChunks = 2;
 const minDiskSize = 1024 * 1024 * 1024; // 1 GiB
 const wax4webDirectionsContainer = document.getElementById("wax4webDirectionsContainer");
 const wax4webEmulatorContainer = document.getElementById("wax4webEmulatorContainer");
@@ -119,10 +120,23 @@ function progressFetch(url) {
 	});
 }
 
+function concatBuffers(buffers) {
+	let buffer = new Uint8Array(buffers.reduce((s, v) => s + v.byteLength, 0));
+	let curOffset = 0;
+	for (var i = 0; i < buffers.length; i++) {
+		buffer.set(new Uint8Array(buffers[i]), curOffset);
+		curOffset += buffers[i].byteLength;
+	}
+	return buffer.buffer;
+}
+
 async function fetchWax4WebTar() {
 	console.log("fetching wax4web.tar.zip");
-	var wax4webTarZip = await progressFetch("wax4web/wax4web.tar.zip");
-	var wax4WebTar = await unzipFile(wax4webTarZip);
+	let chunks = [];
+	for (var i = 0; i < wax4webTarZipChunks; i++) {
+		chunks.push(await progressFetch("wax4web/wax4web_tar_zip/" + i + ".bin"));
+	}
+	var wax4WebTar = await unzipFile(concatBuffers(chunks));
 	return wax4WebTar;
 }
 
