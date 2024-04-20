@@ -198,7 +198,7 @@ function initFromFile(file) {
 		autostart: false
 	});
 	emulator.add_listener("download-progress", function(p) {
-		updateLoadProgress(p.file_name, p.loaded / p.total);
+		if (p.lengthComputable) updateLoadProgress(p.file_name, p.loaded / p.total);
 	});
 	emulator.add_listener("emulator-ready", async function() {
 		var opts = Array.from(waxOptions.querySelectorAll("input[type=checkbox]"));
