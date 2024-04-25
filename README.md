@@ -30,8 +30,8 @@ If your board name is in the list below, great! Find the RAW RMA shim correspond
 We can no longer provide raw RMA shims due to legal reasons. [**More information here**](https://discord.gg/egWXwEDWKP).
 
 ambassador, brask, brya, clapper, coral, corsola, dedede, enguarde, glimmer,
-grunt, hana, hatch, jacuzzi, kefka, kukui, lulu, nami, octopus, orco, pyro,
-reks, sentry, stout, strongbad, tidus, ultima, volteer, zork
+grunt, hana, hatch, jacuzzi, kefka, kukui, lulu, nami, nissa, octopus, orco,
+pyro, reks, sentry, stout, strongbad, tidus, ultima, volteer, zork
 
 If it's not, good luck. You'll have to try and call up your OEM and demand the files from them, which they are most unlikely to give to you.
 
