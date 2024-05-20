@@ -18,9 +18,6 @@ We can edit the other partitions to our will as long as we remove the forced rea
 
 ## How do I use it?
 
-> [!NOTE]
-> [dl.sh1mmer.me](https://dl.sh1mmer.me) has been taken down, so you'll need to find a site rehosting the RMA shims alongside Chromebrew.
-
 Here's how you do that.
 First, you need to know your Chromebook's board. Go to `chrome://version` on your Chromebook and copy the word after `stable-channel`.
 If `chrome://version` is blocked, you can search up your Chromebook's model name on [chrome100](https://chrome100.dev)
@@ -50,14 +47,14 @@ You need to be on Linux or WSL2 and have the following packages installed: `git`
 You may need to install additional packages, which the script will prompt you to do.
 
 ```
-git clone https://github.com/MercuryWorkshop/sh1mmer
+git clone https://github.com/Evanlol123/sh1mmer
 cd sh1mmer/wax
 sudo bash wax.sh -i path/to/the/shim/you/downloaded.bin
 ```
 This will build a beautiful world mini shim. If you want to add chromebrew, do the following:
 
 ```
-git clone https://github.com/MercuryWorkshop/sh1mmer
+git clone https://github.com/Evanlol123/sh1mmer
 cd sh1mmer/wax
 wget https://dl.darkn.bio/api/raw/?path=/Chromebrew/chromebrew.tar.gz
 sudo bash wax.sh -i path/to/the/shim/you/downloaded.bin --chromebrew chromebrew.tar.gz -s 4G
@@ -84,7 +81,7 @@ This makes it impossible for the Beautiful World GUI to work and thus a legacy C
 Type out all of these commands in the terminal.
 
 ```
-git clone https://github.com/MercuryWorkshop/sh1mmer
+git clone https://github.com/Evanlol123/sh1mmer
 cd sh1mmer/wax
 sudo bash wax.sh -i path/to/the/shim/you/downloaded.bin -p legacy
 ```
