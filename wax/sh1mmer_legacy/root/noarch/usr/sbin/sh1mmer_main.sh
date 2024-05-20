@@ -206,7 +206,6 @@ while :; do
 	echo "(r) Reprovision device"
 	echo "(m) Unblock devmode"
 	echo "(u) Enable USB/altfw boot"
-	echo "(g) Reset GBB flags (WP must be disabled)"
 	echo "(h) Touch .developer_mode (skip 5 minute delay)"
 	echo "(v) Remove rootfs verification"
 	echo "(t) Call chromeos-tpm-recovery"
