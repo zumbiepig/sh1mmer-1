@@ -240,6 +240,8 @@ clear
 splash
 credits
 echo ""
+echo "Thank you for using Sh1mmer legacy."
+echo ""
 echo "Reboot in 5 seconds."
 sleep 5
 echo "Rebooting..."
