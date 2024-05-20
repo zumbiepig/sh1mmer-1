@@ -53,19 +53,15 @@ run_task() {
 
 mapname() {
 	case "$(basename "$1")" in
-		'autoupdate.sh') echo -n "Fetch updated payloads. REQUIRES WIFI (not working)" ;;
 		'caliginosity.sh') echo -n "Revert all changes made by sh1mmer (reenroll + more)" ;;
 		'crap.sh') echo -n "CRAP - ChromeOS Automated Partitioning" ;;
 		'cryptosmite.sh') echo -n "Cryptosmite (unenrollment up to r119, by writable)" ;;
 		'defog.sh') echo -n "Set GBB flags to allow devmode and unenrollment on r112-113. WRITE PROTECTION MUST BE DISABLED" ;;
-		'movie.sh') echo -n "HAHA WINDOWS SUX BUT THE MOVIE" ;;
 		'mrchromebox.sh') echo -n "MrChromebox firmware-util.sh" ;;
 		'reset-kern-rollback.sh') echo -n "Reset kernel rollback version" ;;
-		'stopupdates.sh') echo -n "Update disabler? (does this even work?)" ;;
-		'troll.sh') echo -n "hahah wouldn't it be realllly funny if you ran this payload trust me nothing bad will happen" ;;
-		'weston.sh') echo -n "Launch the weston Desktop Environment. REQUIRES A DEVSHIM" ;;
-		'wifi.sh') echo -n "Connect to wifi" ;;
 		'wp-disable.sh') echo -n "WP disable loop (for pencil method)" ;;
+  		'kvs.sh') echo -n "Switch your kernel version (kvs)" ;;
+    		'gbbflags.sh') echo -n "Edit your GBB flags ;; 
 		*) echo -n "$1" ;;
 	esac
 }
